@@ -41,6 +41,7 @@ gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 # detect faces in the grayscale image
 rects = detector(gray, 1)
 
+cropped = []
 # loop over the face detections
 for (i, rect) in enumerate(rects):
 	# determine the facial landmarks for the face region, then
@@ -52,7 +53,17 @@ for (i, rect) in enumerate(rects):
 	# convert dlib's rectangle to a OpenCV-style bounding box
 	# [i.e., (x, y, w, h)], then draw the face bounding box
 	(x, y, w, h) = face_utils.rect_to_bb(rect)
+
+	# Crop facial landmark
+	cropped.append(image[y:y+h, x:x+h])
+
 	cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+	print("Start:", end='')
+	print(x, end=',')
+	print(y)
+	print("End:", end='')
+	print(x + w, end=',')
+	print(y + h)
 
 	# show the face number
 	cv2.putText(image, "Face #{}".format(i + 1), (x - 10, y - 10),
@@ -64,17 +75,29 @@ for (i, rect) in enumerate(rects):
 		cv2.circle(image, (x, y), 1, (0, 0, 255), -1)
 
 # show the output image with the face detections + facial landmarks
-plt.subplot(121)
-plt.imshow(orig)
-plt.xticks([])
-plt.yticks([])
-plt.title("Intput")
 
-plt.subplot(122)
+# Filename
+filename = 'Cropped.jpg'
+# Saving the image
+plt.subplot(1,len(cropped)+1,1)
 plt.imshow(image)
 plt.xticks([])
 plt.yticks([])
-plt.title("Output")
+plt.title("Detection")
+
+z = 0
+for i in cropped:
+	plt.imsave(str(z)+'.jpg', i)
+	z = z + 1
+
+	plt.subplot(1,len(cropped)+1,z+1)
+	plt.imshow(i)
+	plt.xticks([])
+	plt.yticks([])
+	plt.title("Cropped")
+
+		
+
 
 fname = "results/"+"result_" + args["image"][1]
 
